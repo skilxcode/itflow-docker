@@ -1,6 +1,6 @@
 services:
   itflow:
-    hostname: itflow
+    hostname: localhost
     container_name: itflow-nwokkgk4ssw0g00gggss08kk-113553722401
     image: lued/itflow
     restart: unless-stopped
