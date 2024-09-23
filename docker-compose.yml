@@ -34,7 +34,7 @@ services:
       - TZ=$TZ
       - ITFLOW_NAME=ITFlow
       - ITFLOW_URL=$ITFLOW_URL
-      - ITFLOW_PORT=8080
+      - ITFLOW_PORT=80
       - ITFLOW_REPO=github.com/itflow-org/itflow
       - ITFLOW_REPO_BRANCH=master
       - ITFLOW_LOG_LEVEL=info
