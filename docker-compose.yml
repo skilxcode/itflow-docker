@@ -1,93 +1,60 @@
-services:
-  itflow:
-    hostname: localhost
-    container_name: itflow-nwokkgk4ssw0g00gggss08kk-113553722401
-    image: lued/itflow
-    restart: unless-stopped
-    depends_on:
-      - itflow-db
-    networks:
-      itflow-db: null
-      nwokkgk4ssw0g00gggss08kk: null
-    environment:
-      TZ: $TZ
-      ITFLOW_NAME: ITFlow
-      ITFLOW_URL: $ROOT_DOMAIN
-      ITFLOW_PORT: '8080'
-      ITFLOW_REPO: github.com/itflow-org/itflow
-      ITFLOW_REPO_BRANCH: master
-      ITFLOW_LOG_LEVEL: info
-      ITFLOW_DB_HOST: itflow-db
-      ITFLOW_DB_PASS: $ITFLOW_DB_PASS
-      COOLIFY_BRANCH: '"main"'
-      COOLIFY_CONTAINER_NAME: '"itflow-nwokkgk4ssw0g00gggss08kk-113553722401"'
-      COOLIFY_URL: 'http://vs8ggo8c8wc8kw08c8gwsgkg.35.195.240.101.sslip.io'
-      COOLIFY_FQDN: vs8ggo8c8wc8kw08c8gwsgkg.35.195.240.101.sslip.io
-      COOLIFY_APP_NAME: '"skilxcode/itflow-docker:main"'
-      COOLIFY_SERVER_IP: '"host.docker.internal"'
-      COOLIFY_ENVIRONMENT_NAME: '"production"'
-      COOLIFY_PROJECT_NAME: '"My first project"'
-    volumes:
-      - '/data/coolify/applications/nwokkgk4ssw0g00gggss08kk/itflow:/var/www/html'
-    labels:
-      - coolify.managed=true
-      - coolify.version=4.0.0-beta.341
-      - coolify.applicationId=3
-      - coolify.type=application
-      - coolify.name=itflow-nwokkgk4ssw0g00gggss08kk-113553722401
-      - coolify.pullRequestId=0
-      - traefik.enable=true
-      - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-      - traefik.http.routers.http-0-nwokkgk4ssw0g00gggss08kk-itflow.entryPoints=http
-      - traefik.http.routers.http-0-nwokkgk4ssw0g00gggss08kk-itflow.middlewares=gzip
-      - "traefik.http.services.itflow-svc.loadbalancer.server.port=8080"
-      - 'traefik.http.routers.http-0-nwokkgk4ssw0g00gggss08kk-itflow.rule=Host(`vs8ggo8c8wc8kw08c8gwsgkg.35.195.240.101.sslip.io`) && PathPrefix(`/`)'
-      - 'caddy_0.encode=zstd gzip'
-      - 'caddy_0.handle_path.0_reverse_proxy={{upstreams}}'
-      - 'caddy_0.handle_path=/*'
-      - caddy_0.header=-Server
-      - 'caddy_0.try_files={path} /index.html /index.php'
-      - 'caddy_0=http://vs8ggo8c8wc8kw08c8gwsgkg.35.195.240.101.sslip.io'
-      - caddy_ingress_network=nwokkgk4ssw0g00gggss08kk
-      
-  itflow-db:
-    hostname: itflow-db
-    container_name: itflow-db-nwokkgk4ssw0g00gggss08kk-113553747577
-    image: 'mariadb:10.6.11'
-    restart: always
-    networks:
-      itflow-db: null
-      nwokkgk4ssw0g00gggss08kk: null
-    environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: 'true'
-      MARIADB_DATABASE: itflow
-      MARIADB_USER: itflow
-      MARIADB_PASSWORD: $ITFLOW_DB_PASS
-      COOLIFY_BRANCH: '"main"'
-      COOLIFY_CONTAINER_NAME: '"itflow-db-nwokkgk4ssw0g00gggss08kk-113553747577"'
-      COOLIFY_APP_NAME: '"skilxcode/itflow-docker:main"'
-      COOLIFY_SERVER_IP: '"host.docker.internal"'
-      COOLIFY_ENVIRONMENT_NAME: '"production"'
-      COOLIFY_PROJECT_NAME: '"My first project"'
-    volumes:
-      - 'nwokkgk4ssw0g00gggss08kk_itflow-db:/var/lib/mysql/'
-    labels:
-      - coolify.managed=true
-      - coolify.version=4.0.0-beta.341
-      - coolify.applicationId=3
-      - coolify.type=application
-      - coolify.name=itflow-db-nwokkgk4ssw0g00gggss08kk-113553747577
-      - coolify.pullRequestId=0
-volumes:
-  nwokkgk4ssw0g00gggss08kk_itflow-db:
-    name: nwokkgk4ssw0g00gggss08kk_itflow-db
+version: "3.9"
+########################### NETWORKS
+
 networks:
+  wan:
+    name: wan
+    driver: bridge
+      
   itflow-db:
     name: itflow-db
     external: false
-  nwokkgk4ssw0g00gggss08kk:
-    name: nwokkgk4ssw0g00gggss08kk
-    external: true
-configs: {  }
-secrets: {  }
+
+########################### VOLUMES
+
+volumes:
+  itflow-db:
+
+########################### DOCKER / TRAEFIK
+
+services:
+
+  itflow:
+    hostname: itflow
+    container_name: itflow
+    image: lued/itflow
+    # build: ../.
+    restart: unless-stopped
+    depends_on: 
+      - itflow-db
+    networks:
+      - wan
+      - itflow-db
+    environment:
+      - TZ=$TZ
+      - ITFLOW_NAME=ITFlow
+      - ITFLOW_URL=$ITFLOW_URL
+      - ITFLOW_PORT=8080
+      - ITFLOW_REPO=github.com/itflow-org/itflow
+      - ITFLOW_REPO_BRANCH=master
+      - ITFLOW_LOG_LEVEL=info
+      - ITFLOW_DB_HOST=itflow-db
+      - ITFLOW_DB_PASS=$ITFLOW_DB_PASS
+    volumes:
+      - ${DOCKERDIR}/itflow/:/var/www/html
+
+  itflow-db:
+    hostname: itflow-db
+    container_name: itflow-db
+    image: mariadb:10.6.11
+    restart: always
+    networks:
+      - itflow-db
+    environment:
+      - TZ=$TZ
+      - MARIADB_RANDOM_ROOT_PASSWORD=true
+      - MARIADB_DATABASE=itflow
+      - MARIADB_USER=itflow
+      - MARIADB_PASSWORD=$ITFLOW_DB_PASS
+    volumes:
+      - itflow-db:/var/lib/mysql/
