@@ -1,10 +1,4 @@
 version: "3.9"
-########################### NETWORKS
-
-networks:
-  itflow-db:
-    name: itflow-db
-    external: false
 
 ########################### VOLUMES
 
@@ -22,8 +16,6 @@ services:
     # build: ../.
     restart: unless-stopped
     depends_on: 
-      - itflow-db
-    networks:
       - itflow-db
     environment:
       - TZ=$TZ
@@ -43,8 +35,6 @@ services:
     container_name: itflow-db
     image: mariadb:10.6.11
     restart: always
-    networks:
-      - itflow-db
     environment:
       - TZ=$TZ
       - MARIADB_RANDOM_ROOT_PASSWORD=true
