@@ -2,10 +2,6 @@ version: "3.9"
 ########################### NETWORKS
 
 networks:
-  wan:
-    name: wan
-    driver: bridge
-      
   itflow-db:
     name: itflow-db
     external: false
@@ -28,7 +24,6 @@ services:
     depends_on: 
       - itflow-db
     networks:
-      - wan
       - itflow-db
     environment:
       - TZ=$TZ
