@@ -3,7 +3,12 @@ version: "3.9"
 ########################### VOLUMES
 
 networks:
+  wan:
+    name: wan
+    driver: bridge
+      
   itflow-db:
+    name: itflow-db
     external: false
 
 volumes:
@@ -20,6 +25,7 @@ services:
     # build: ../.
     restart: unless-stopped
     networks:
+      - wan
       - itflow-db
     depends_on: 
       - itflow-db
